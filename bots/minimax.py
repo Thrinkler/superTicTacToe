@@ -20,13 +20,10 @@ class Minimax:
             col_val = [0,0,0]
             diag_val = [0,0]
             for i,line in enumerate(board):
-                    
                 for j,item in enumerate(line):
-                    if col_val[j] == -1:
-                        continue
                     if player == -item:
                         col_val[j] = -1
-                    if player == item:
+                    if player == item and col_val != -1:
                         col_val[j]+=1
 
                     if player == -item:
@@ -68,6 +65,8 @@ class Minimax:
         
         #caso base
         if abs(game.who_won) == 1:
+            #message = "I win in " if game.who_won * player == 1 else "I loose in "
+            #print(message, depth, " moves") 
             return game.who_won * player* math.inf, [0,0]
         if game.who_won == 2:
             return 0,[0,0]
@@ -83,24 +82,21 @@ class Minimax:
 
 
         posible_pos = self.moves_from_all_board(game)#self.get_posible_pos(board)
-        
+        random.shuffle(posible_pos)
         if not posible_pos:
             return 0, [0,0]
-        best_pos = [posible_pos[0]]
-
-        alfa = -math.inf
+        best_pos = posible_pos[0]
         for pos in posible_pos:
             rec_game = copy.deepcopy(game)
             rec_game.aut_play(pos[0][:],pos[1][:])
             oponent_score,thought_pos = self.recursive_minimax(rec_game,depth = depth-1, player = -player, alfa = -beta, beta = -alfa)
+            
             if alfa< -oponent_score:
-                best_pos = [pos]
+                best_pos = pos
                 alfa = -oponent_score
-            elif alfa == -oponent_score:
-                best_pos.append(pos)
             if alfa >= beta:
                 break
-        return alfa,random.choice(best_pos)
+        return alfa,best_pos
 
     def get_posible_pos(self, board)-> list[list[int]]:
 

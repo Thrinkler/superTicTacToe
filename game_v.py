@@ -42,11 +42,12 @@ class TikTakToe:
         k = 0
         r = [0,0,0]
         for i in range(3):
+            k = 0
             for j in range(3):
                 r[j] += self.board[i][j] if self.board[i][j] < 2 else 0
                 k+=self.board[i][j] if self.board[i][j] < 2 else 0
-            win = max(win,abs(k),abs(r[0]),abs(r[1]),abs(r[2]))
-            k = 0
+            win = max(win, abs(k))
+        win = max(win,abs(r[0]),abs(r[1]),abs(r[2]))
         diagonals = [0,0]
         for i in range(3):
 
@@ -63,7 +64,7 @@ class TikTakToe:
             for item in line:
                 player = "_"
                 if abs(item) == 1:
-                    player = "X" if item ==1 else "O"
+                    player = "O" if item ==1 else "X"
                 outp[i].append(player)
                     
 
@@ -127,7 +128,7 @@ class RecursiveTikTakToe(TikTakToe):
                         for play in h.board[i]:
                             player = "_"
                             if abs(play) == 1:
-                                player = "X" if play ==1 else "O"
+                                player = "O" if play ==1 else "X"
                             play_line.append(player)
                     else:
                         for play in h.detailed_board[i]:
@@ -151,20 +152,12 @@ class GameController:
     def play(self):
         if self.who_won == 0:
             self.print_board()
+            self.game.play(self.player)
             self.player = -self.player
             self.who_won = self.game.who_won
             print(self.who_won)
         return self.who_won
     
-    def print_board(self):
-        #print("Player: ", "X" if self.player == 1 else "O")
-        print(self.game.__str__())
-        for g in self.game.board:
-            print(g)
-        get_board_to_play = self.get_board_to_play()
-        if get_board_to_play != [-1,-1]:
-            print("subBoard: ")
-            print(self.game.detailed_board[get_board_to_play[0]][get_board_to_play[1]].__str__())
     def play_no_prints(self):
         if self.who_won == 0:
             self.game.play(self.player)
@@ -178,6 +171,17 @@ class GameController:
             self.player = -self.player
             self.who_won = self.game.who_won
         return self.who_won
+    
+    def print_board(self):
+        #print("Player: ", "X" if self.player == 1 else "O")
+        print(self.game.__str__())
+        for g in self.game.board:
+            print(g)
+        get_board_to_play = self.get_board_to_play()
+        if get_board_to_play != [-1,-1]:
+            print("subBoard: ")
+            print(self.game.detailed_board[get_board_to_play[0]][get_board_to_play[1]].__str__())
+    
 
     def get_game_state(self):
         return self.game.complete_board()
