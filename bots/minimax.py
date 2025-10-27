@@ -41,9 +41,15 @@ class Minimax:
                         elif player == item and diag_val[1]!= -1:
                             diag_val[1]+=1
             
-            l_val = numpy.sum(10.0**numpy.array(line_val))
-            c_val = numpy.sum(10.0**numpy.array(col_val))
-            d_val = numpy.sum(10.0**numpy.array(diag_val))
+            l_val = 0
+            c_val = 0
+            d_val = 0
+            for v in line_val:
+                l_val += 10**v
+            for v in col_val:
+                c_val += 10**v
+            for v in diag_val:
+                d_val += 10**v
             persp_val = int(l_val+c_val+d_val) *player
             persp_val *= 2 if player == next_player and persp_val >100 else 1
 
@@ -51,9 +57,19 @@ class Minimax:
         
         return sum_val
 
-    def choose_pos(self, board):
-        return[0,0]
-   
+    def evaluate_pos(self, pos,game: game_v.GameController,player = 0):
+        game.aut_play(pos[0][:],pos[1][:])
+        general_board = game.game.board
+        can_have_subboard = game.get_board_to_play() != [-1,-1]
+
+        general_score = player *self.check_heur_board(general_board, game.player)
+        subboard_score = 0
+        if can_have_subboard:
+            board_to_play = game.get_board_to_play()
+            subboard = game.get_game_state()[board_to_play[0]][board_to_play[1]]
+            subboard_score = player *self.check_heur_board(subboard, game.player)
+        game.undo_play()
+        return general_score*10 + subboard_score, [0,0]
 
     def recursive_minimax(self, game: game_v.GameController ,depth = 1, player = 0, alfa = -math.inf, beta = math.inf) -> tuple[float | int, list[int]]:
         if player == 0:
@@ -78,8 +94,8 @@ class Minimax:
             return general_score*10 + subboard_score, [0,0]
 
 
-        posible_pos = self.moves_from_all_board(game)#self.get_posible_pos(board)
-        random.shuffle(posible_pos)
+        posible_pos = self.moves_from_all_board(game)
+        
         if not posible_pos:
             return 0, [0,0]
         best_pos = posible_pos[0]

@@ -95,5 +95,5 @@ game = game_v.GameController()
 
 
 if __name__ == "__main__":
-    battle_robots(game,Minimax(game,-1, depth=8),Minimax(game,1, depth=9))
+    battle_robots(game,Minimax(game,-1, depth=6),Minimax(game,1, depth=7))
     #game_pve(game,Minimax(game,-1,6))
