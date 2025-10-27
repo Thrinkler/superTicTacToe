@@ -1,4 +1,3 @@
-import copy
 import math
 import random
 import numpy
@@ -65,8 +64,6 @@ class Minimax:
         
         #caso base
         if abs(game.who_won) == 1:
-            #message = "I win in " if game.who_won * player == 1 else "I loose in "
-            #print(message, depth, " moves") 
             return game.who_won * player* math.inf, [0,0]
         if game.who_won == 2:
             return 0,[0,0]
@@ -87,10 +84,9 @@ class Minimax:
             return 0, [0,0]
         best_pos = posible_pos[0]
         for pos in posible_pos:
-            rec_game = copy.deepcopy(game)
-            rec_game.aut_play(pos[0][:],pos[1][:])
-            oponent_score,thought_pos = self.recursive_minimax(rec_game,depth = depth-1, player = -player, alfa = -beta, beta = -alfa)
-            
+            game.aut_play(pos[0][:],pos[1][:])
+            oponent_score,thought_pos = self.recursive_minimax(game,depth = depth-1, player = -player, alfa = -beta, beta = -alfa)
+            game.undo_play()
             if alfa< -oponent_score:
                 best_pos = pos
                 alfa = -oponent_score

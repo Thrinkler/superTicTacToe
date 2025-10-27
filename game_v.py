@@ -10,6 +10,8 @@ class TikTakToe:
         self.detailed_board = []
         self.who_won = 0
         self.moves = 0
+
+        self.move_made = []
     
     def play(self, player, man_inputs = True, aut_row = [0], aut_col = [0]):
 
@@ -29,11 +31,18 @@ class TikTakToe:
                 man_inputs = True
             
         self.board[row][column] = player
+        self.move_made.append([row,column])
         self.check_win(player)
 
         self.moves +=1
 
         return [row,column]
+
+    def undo_move(self):
+        move_made = self.move_made.pop()
+        self.board[move_made[0]][move_made[1]] = 0
+        self.who_won = 0
+        self.moves -=1
     
     def check_win(self, player):
         if self.moves == 8:
@@ -85,6 +94,8 @@ class RecursiveTikTakToe(TikTakToe):
         self.moves = 0
         self.last_row_col = [-1,-1]
 
+        self.move_made = []
+
     def play(self, player, man_inputs = True, aut_row = [0,0], aut_col = [0,0]):
 
         isValid = self.board[self.last_row_col[0]][self.last_row_col[1]] == 0 if self.last_row_col != [-1,-1] else False
@@ -105,14 +116,33 @@ class RecursiveTikTakToe(TikTakToe):
             if not isValid: 
                 print("Position not allowed")
                 man_inputs = True
-        self.last_row_col = self.detailed_board[row][column].play(player, man_inputs=man_inputs,aut_row=aut_row,aut_col=aut_col)
         
+        
+        move_info = (
+            (row, column), 
+            self.last_row_col[:],
+            self.who_won,
+            self.moves,
+            self.board[row][column]
+        )
+        self.last_row_col = self.detailed_board[row][column].play(player, man_inputs=man_inputs,aut_row=aut_row,aut_col=aut_col)
+        self.move_made.append(move_info)
 
         if self.detailed_board[row][column].who_won != 0:
             self.board[row][column] = self.detailed_board[row][column].who_won
             self.moves +=1
             self.check_win(player)
         return [row,column]
+
+    def undo_move(self):
+        position,last_row_col,who_won,moves,board_pos = self.move_made.pop()
+
+        self.detailed_board[position[0]][position[1]].undo_move()
+        self.last_row_col = last_row_col
+        self.who_won = who_won
+        self.moves = moves
+        self.board[position[0]][position[1]]= board_pos
+
     
     def complete_board(self):
         return [[tik.board for tik in p] for p in self.detailed_board]
@@ -158,6 +188,11 @@ class GameController:
             print(self.who_won)
         return self.who_won
     
+    def undo_play(self):
+        self.game.undo_move()
+        self.player = -self.player
+        self.who_won = self.game.who_won
+    
     def play_no_prints(self):
         if self.who_won == 0:
             self.game.play(self.player)
@@ -171,6 +206,12 @@ class GameController:
             self.player = -self.player
             self.who_won = self.game.who_won
         return self.who_won
+    
+    def aut_move_do(self,aut_row,aut_col):
+        
+        self.game.play(self.player,man_inputs=False,aut_row=aut_row,aut_col=aut_col)
+        self.player = -self.player
+        self.who_won = self.game.who_won
     
     def print_board(self):
         #print("Player: ", "X" if self.player == 1 else "O")

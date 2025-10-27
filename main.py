@@ -93,6 +93,7 @@ def battle_robots(game,robot1,robot2):
 
 game = game_v.GameController()
 
-#battle_robots(game,minimax.Minimax(game,-1, depth=3),griddy.Griddy(game))
-battle_robots(game,Minimax(game,-1, depth=11),Minimax(game,1, depth=13))
-#game_pve(game,Minimax(game,-1,6))
+
+if __name__ == "__main__":
+    battle_robots(game,Minimax(game,-1, depth=8),Minimax(game,1, depth=9))
+    #game_pve(game,Minimax(game,-1,6))
